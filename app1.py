@@ -67,15 +67,14 @@ if img_file_buffer is not None:
             st.success("¡Lectura completada con éxito!")
             
             # Botón opcional para copiar/descargar el texto
-            st.download_button(
-                label="📥 Descargar texto",
-                data=text,
-                file_name="texto_extraido.txt",
-                mime="text/plain"
-            )
-        else:
-            st.warning("⚠️ No se detectó ningún texto en la imagen. Intenta mejorar la iluminación o cambiar el filtro.")
-
-    
+           with st.expander("💾 Opciones de exportación", expanded=True):
+    st.write("Guarda el texto escaneado directamente en tu dispositivo:")
+    st.download_button(
+        label="📄 Guardar como archivo .TXT",
+        data=text,
+        file_name="escaneo_ocr.txt",
+        mime="text/plain",
+        use_container_width=True
+    )
 
 
