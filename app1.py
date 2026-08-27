@@ -3,43 +3,104 @@ import cv2
 import numpy as np
 import pytesseract
 
-# Configuración de la página para aprovechar todo el ancho del navegador
+# Configuración de la página
 st.set_page_config(
-    page_title="Scanner OCR Pro",
-    page_icon="🔍",
+    page_title="Scanner OCR Studio",
+    page_icon="✨",
     layout="wide"
 )
 
-# Estilo personalizado básico con CSS
+# Estilos CSS personalizados (Colores, bordes redondeados y efectos)
 st.markdown("""
     <style>
-    .main-title {
+    /* Fondo general de la app */
+    .stApp {
+        background-color: #0F172A;
+        color: #F8FAFC;
+    }
+    
+    /* Titular con texto degradado */
+    .gradient-title {
+        background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 2.5rem;
+        font-weight: 800;
         text-align: center;
-        color: #2C3E50;
+        margin-bottom: 0.5rem;
+    }
+    
+    .sub-title {
+        text-align: center;
+        color: #94A3B8;
+        font-size: 1rem;
         margin-bottom: 2rem;
     }
-    .stText {
-        font-family: monospace;
+
+    /* Estilo de la barra lateral */
+    section[data-testid="stSidebar"] {
+        background-color: #1E293B;
+        border-right: 1px solid #334155;
+    }
+
+    /* Tarjetas de contenido con bordes muy suaves */
+    div[data-testid="stVerticalBlock"] > div:has(div.card-container) {
+        background-color: #1E293B;
+        padding: 1.5rem;
+        border-radius: 20px;
+        border: 1px solid #334155;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Personalización del botón de descarga */
+    div.stDownloadButton > button {
+        background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
+        color: #FFFFFF !important;
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 700;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+    }
+    
+    div.stDownloadButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6);
+        background: linear-gradient(135deg, #4F46E5 0%, #9333EA 100%);
+    }
+
+    /* Formato del área de texto resultante */
+    textarea {
+        background-color: #0F172A !important;
+        color: #38BDF8 !important;
+        border: 1px solid #334155 !important;
+        border-radius: 12px !important;
+        font-family: 'Courier New', Courier, monospace !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Encabezado principal
-st.markdown("<h1 class='main-title'>🔍 Reconocimiento Óptico de Caracteres (OCR)</h1>", unsafe_allow_html=True)
-st.caption("Captura una imagen desde tu cámara para extraer el texto automáticamente.")
-st.divider()
+# Encabezado estilizado
+st.markdown("<h1 class='gradient-title'>✨ Scanner OCR Studio</h1>", unsafe_allow_html=True)
+st.markdown("<p class='sub-title'>Procesamiento óptico de caracteres con estilo visual moderno</p>", unsafe_allow_html=True)
 
-# Barra lateral con controles
+# Barra lateral con diseño ajustado
 with st.sidebar:
-    st.header("⚙️ Configuración")
-    filtro = st.radio("Filtro de imagen:", ('Sin Filtro', 'Con Filtro (Invertir colores)'))
-    st.info("💡 Tip: Invertir los colores ayuda a Tesseract a leer texto claro sobre fondos oscuros.")
+    st.markdown("### ⚙️ Panel de Control")
+    st.divider()
+    filtro = st.radio("Ajuste de Filtro:", ('Sin Filtro', 'Con Filtro (Invertir colores)'))
+    
+    st.markdown("---")
+    st.info("💡 **Tip de captura:** Invertir los colores facilita la lectura en textos blancos con fondos oscuros.")
 
-# Área principal de la aplicación
-img_file_buffer = st.camera_input("Toma una foto")
+# Entrada de la cámara
+img_file_buffer = st.camera_input("📷 Haz clic abajo para tomar una foto")
 
 if img_file_buffer is not None:
-    # Procesamiento de la imagen con OpenCV
+    # Procesamiento con OpenCV
     bytes_data = img_file_buffer.getvalue()
     cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
     
@@ -49,31 +110,29 @@ if img_file_buffer is not None:
     img_rgb = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB)
     text = pytesseract.image_to_string(img_rgb)
     
-    st.divider()
+    st.write("") # Espaciador
     
-    # Distribución en 2 columnas para el resultado visual
+    # Distribución en 2 columnas dentro de contenedores estilizados
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("🖼️ Imagen procesada")
-        st.image(img_rgb, use_column_width=True, caption="Vista previa utilizada para la lectura")
+        st.markdown('<div class="card-container"></div>', unsafe_allow_html=True)
+        st.markdown("### 🖼️ Imagen Procesada")
+        st.image(img_rgb, use_column_width=True)
         
     with col2:
-        st.subheader("📄 Texto detectado")
+        st.markdown('<div class="card-container"></div>', unsafe_allow_html=True)
+        st.markdown("### 📄 Resultado Digital")
         
         if text.strip():
-            # Muestra el texto procesado dentro de una caja destacada
-            st.text_area("Resultado OCR", value=text, height=300)
-            st.success("¡Lectura completada con éxito!")
-            
-            # Botón opcional para copiar/descargar el texto
+            st.text_area("Texto Detectado", value=text, height=260, label_visibility="collapsed")
+            st.write("")
             st.download_button(
-                label="📥 Descargar texto",
+                label="⚡ DESCARGAR TEXTO DETECTADO",
                 data=text,
                 file_name="texto_extraido.txt",
-                mime="text/plain"
+                mime="text/plain",
+                use_container_width=True
             )
         else:
-            st.warning("⚠️ No se detectó ningún texto en la imagen. Intenta mejorar la iluminación o cambiar el filtro.")
-
-
+            st.warning("⚠️ No se detectó texto en la imagen. Intenta con mejor iluminación o cambiando el filtro.")
