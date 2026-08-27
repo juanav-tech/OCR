@@ -67,7 +67,7 @@ if img_file_buffer is not None:
             st.success("¡Lectura completada con éxito!")
             
             # Botón opcional para copiar/descargar el texto
-           with st.expander("💾 Opciones de exportación", expanded=True):
+   with st.expander("💾 Opciones de exportación", expanded=True):
     st.write("Guarda el texto escaneado directamente en tu dispositivo:")
     st.download_button(
         label="📄 Guardar como archivo .TXT",
