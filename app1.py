@@ -2,33 +2,79 @@ import streamlit as st
 import cv2
 import numpy as np
 import pytesseract
-from PIL import Image
 
+# Configuración de la página para aprovechar todo el ancho del navegador
+st.set_page_config(
+    page_title="Scanner OCR Pro",
+    page_icon="🔍",
+    layout="wide"
+)
 
-st.title("Reconocimiento óptico de Caracteres")
+# Estilo personalizado básico con CSS
+st.markdown("""
+    <style>
+    .main-title {
+        text-align: center;
+        color: #2C3E50;
+        margin-bottom: 2rem;
+    }
+    .stText {
+        font-family: monospace;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-img_file_buffer = st.camera_input("Toma una Foto")
+# Encabezado principal
+st.markdown("<h1 class='main-title'>🔍 Reconocimiento Óptico de Caracteres (OCR)</h1>", unsafe_allow_html=True)
+st.caption("Captura una imagen desde tu cámara para extraer el texto automáticamente.")
+st.divider()
 
+# Barra lateral con controles
 with st.sidebar:
-      filtro = st.radio("Aplicar Filtro",('Con Filtro', 'Sin Filtro'))
+    st.header("⚙️ Configuración")
+    filtro = st.radio("Filtro de imagen:", ('Sin Filtro', 'Con Filtro (Invertir colores)'))
+    st.info("💡 Tip: Invertir los colores ayuda a Tesseract a leer texto claro sobre fondos oscuros.")
 
+# Área principal de la aplicación
+img_file_buffer = st.camera_input("Toma una foto")
 
 if img_file_buffer is not None:
-    # To read image file buffer with OpenCV:
+    # Procesamiento de la imagen con OpenCV
     bytes_data = img_file_buffer.getvalue()
     cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
     
-    if filtro == 'Con Filtro':
-         cv2_img=cv2.bitwise_not(cv2_img)
-    else:
-         cv2_img= cv2_img
-    
+    if filtro == 'Con Filtro (Invertir colores)':
+        cv2_img = cv2.bitwise_not(cv2_img)
         
     img_rgb = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB)
-    text=pytesseract.image_to_string(img_rgb)
-    st.write(text) 
+    text = pytesseract.image_to_string(img_rgb)
     
-
+    st.divider()
+    
+    # Distribución en 2 columnas para el resultado visual
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("🖼️ Imagen procesada")
+        st.image(img_rgb, use_column_width=True, caption="Vista previa utilizada para la lectura")
+        
+    with col2:
+        st.subheader("📄 Texto detectado")
+        
+        if text.strip():
+            # Muestra el texto procesado dentro de una caja destacada
+            st.text_area("Resultado OCR", value=text, height=300)
+            st.success("¡Lectura completada con éxito!")
+            
+            # Botón opcional para copiar/descargar el texto
+            st.download_button(
+                label="📥 Descargar texto",
+                data=text,
+                file_name="texto_extraido.txt",
+                mime="text/plain"
+            )
+        else:
+            st.warning("⚠️ No se detectó ningún texto en la imagen. Intenta mejorar la iluminación o cambiar el filtro.")
 
     
 
