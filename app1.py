@@ -67,14 +67,13 @@ if img_file_buffer is not None:
             st.success("¡Lectura completada con éxito!")
             
             # Botón opcional para copiar/descargar el texto
-  # Reemplaza st.download_button estándar por este:
-st.download_button(
-    label="📥 DESCARGAR TEXTO DETECTADO",
-    data=text,
-    file_name="texto_extraido.txt",
-    mime="text/plain",
-    use_container_width=True,
-    type="primary"
-)
+            st.download_button(
+                label="📥 Descargar texto",
+                data=text,
+                file_name="texto_extraido.txt",
+                mime="text/plain"
+            )
+        else:
+            st.warning("⚠️ No se detectó ningún texto en la imagen. Intenta mejorar la iluminación o cambiar el filtro.")
 
 
